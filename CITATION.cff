@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this software in your research, please cite it as below."
+title: "FreeFemCheckpoint"
+abstract: "Partition-independent parallel checkpoint/restart plugin for distributed FreeFEM finite-element fields. Independent third-party project, not part of the official FreeFEM distribution."
+authors:
+  - family-names: "DieyuRin"
+    given-names: ""
+version: "0.3.0"
+date-released: "2026-09-07"
+license: "LGPL-3.0-or-later"
+url: "https://github.com/DieyuRin/FreeFEM-Parallel-Checkpoint"
+repository-code: "https://github.com/DieyuRin/FreeFEM-Parallel-Checkpoint.git"
