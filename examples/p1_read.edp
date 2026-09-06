@@ -1,6 +1,6 @@
 // p1_read.edp -- N-to-M restart read of a scalar P1 checkpoint.
 //
-// Reads a checkpoint (written with any np) with the current np and checks
+// Reads a checkpoint (written with N ranks) with the current M ranks and checks
 // every local DOF against the exact function.
 //
 // Run:  ff-mpirun -np M examples/p1_read.edp -chk checkpoint_p1.ffio -v 0

@@ -1,11 +1,5 @@
 # Changelog
 
-## [Unreleased]
-
-- Selected `LGPL-3.0-or-later` as the project license.
-- Added root `LICENSE`.
-- Added SPDX license identifiers and contribution-license notice.
-
 ## [0.3.0] - 2026-09-07
 
 Public-release hardening / stabilization:
@@ -21,6 +15,8 @@ Public-release hardening / stabilization:
 - Hardened reader header/file validation: size check before decoding,
   `MPI_Get_count == 64`, strict exact-size policy (rejects truncated payloads
   and trailing bytes), overflow-safe expected-size arithmetic
+- Checked the writer's 64-byte header write count (`MPI_Get_count == 64`) and
+  folded `MPI_File_close` failures into the writer error state
 - Added MPI_Alltoallv int count/displacement overflow checks
   (`kErrOverflow`)
 - Defined non-finite policy: NaN/Inf checkpoint values rejected
@@ -28,13 +24,20 @@ Public-release hardening / stabilization:
 - Added compile-time format guards (`static_assert`) and explicit includes
 - Removed the V0 rank-concatenated `ffioWrite` helper from the public plugin
   (see docs/legacy-v0.md)
-- Added repository structure and build system (Makefile, `make test`)
+- Selected `LGPL-3.0-or-later` as the project license; added root `LICENSE`,
+  SPDX license identifiers, and the contribution-license notice
+- Added repository structure and build system (Makefile, `make test`);
+  `FF_MPIRUN` is exported and honored by the test suite, and MPI tests run
+  under a configurable timeout (`FFCP_TEST_TIMEOUT`)
 - Expanded test suite: scalar (36) and mixed (15) N-to-M matrices, payload
-  invariance, corruption tests (magic/version/width/Nglobal/short header/
-  truncation/trailing bytes), duplicate-policy tests (within tolerance,
-  conflict, NaN, +Inf), gid-range/size-mismatch/missing-DOF negative tests
+  invariance over writer np {1,2,3,4,8,16}, inspector policy regression,
+  corruption tests (magic/version/width/Nglobal/short header/truncation/
+  trailing bytes), duplicate-policy tests (within tolerance, conflict, NaN,
+  +Inf), and gid-range/size-mismatch/missing-DOF negative tests asserting
+  their exact `kErr*` codes
 - Added formal documentation (API, DESIGN, FILE_FORMAT, BUILD, DEVELOPMENT,
-  RECIPES, legacy-v0)
+  RECIPES, legacy-v0) and aligned wording with the tested rank sets; the
+  missing-suffix (beyond `max(gid)`) coverage limitation is documented
 
 ## [0.2.0]
 

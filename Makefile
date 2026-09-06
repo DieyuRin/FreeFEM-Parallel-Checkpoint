@@ -2,6 +2,7 @@ PLUGIN   := FreeFemCheckpoint
 SRC      := src/FreeFemCheckpoint.cpp
 FF_CXX   ?= ff-c++
 FF_MPIRUN ?= ff-mpirun
+export FF_MPIRUN
 
 .PHONY: all clean test test-scalar test-mixed test-negative
 

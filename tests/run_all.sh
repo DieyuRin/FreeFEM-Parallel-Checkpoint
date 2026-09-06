@@ -11,6 +11,7 @@ for t in \
     tests/run_scalar_matrix.sh \
     tests/run_mixed_matrix.sh \
     tests/test_payload_invariance.sh \
+    tests/test_inspector.sh \
     tests/test_invalid_header.sh \
     tests/test_wrong_version.sh \
     tests/test_wrong_width.sh \

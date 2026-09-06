@@ -39,11 +39,12 @@ one checkpoint file
    store canonical dof `g`;
 4. `Alltoallv` routes every `(gid, value)` pair to its block owner (counts and
    displacements validated with 64-bit accumulation before use);
-5. owner deduplicates: the first value for a gid is kept; later copies must
+5. writer coverage: complete contiguous coverage of the inferred canonical range `[0, max(gid)]` is required (interior gaps are rejected); the expected global FE-space dimension is not known to the plugin, so a missing suffix beyond `max(gid)` is not detectable;
+6. owner deduplicates: the first value for a gid is kept; later copies must
    satisfy `valuesConsistent` (finite, relative tolerance 1e-12), otherwise
    the write fails collectively; any canonical gid never seen is a missing
    DOF and fails the write collectively;
-6. each rank writes its contiguous block with `MPI_File_write_at_all`
+7. each rank writes its contiguous block with `MPI_File_write_at_all`
    (one 64-byte header buffer written once at offset 0, payload at
    `64 + ioBegin*sizeof(double)`; `MPI_File_set_size(0)` gives
    overwrite/truncate semantics).

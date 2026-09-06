@@ -491,10 +491,16 @@ static long checkpointWriteImpl(string* const& filename,
     memcpy(hdr.data() + 56, &reserved64, 8);
 
     MPI_Status st;
-    if (rank == 0)
+    int hdrCount = 0;
+    if (rank == 0) {
         ierr = MPI_File_write_at(fh, 0, hdr.data(),
                                  static_cast<int>(kHeaderSize), MPI_BYTE, &st);
-    int localErr = (rank != 0 || ierr == MPI_SUCCESS) ? 0 : 1;
+        if (ierr == MPI_SUCCESS)
+            MPI_Get_count(&st, MPI_BYTE, &hdrCount);
+    }
+    // rank 0 must have written exactly 64 bytes (short-write detection)
+    const int localErr = (rank != 0) ? 0 :
+        ((ierr == MPI_SUCCESS && hdrCount == kHeaderSize) ? 0 : 1);
     if (collectiveAnyError(localErr, comm)) {
         const long code = checkpointFail(kErrWrite, comm);
         if (rank == 0) printFailure(code);
@@ -512,13 +518,19 @@ static long checkpointWriteImpl(string* const& filename,
     double* ptr = ioN ? ioValue.data() : nullptr;
     ierr = MPI_File_write_at_all(fh, payloadOffset, ptr,
                                  static_cast<int>(ioN), MPI_DOUBLE, &st);
-    localErr = (ierr == MPI_SUCCESS) ? 0 : 1;
-    const long code = checkpointFail(localErr ? kErrWrite : 0, comm);
-    ierr = MPI_File_close(&fh);
-    if (localErr && rank == 0)
-        printFailure(kErrWrite);
-    if (code != 0)
-        return code;
+    localCode = (ierr == MPI_SUCCESS) ? 0 : kErrWrite;
+
+    const int closeErr = MPI_File_close(&fh);
+    if (localCode == 0 && closeErr != MPI_SUCCESS)
+        localCode = kErrWrite;
+
+    {
+        const long code = checkpointFail(localCode, comm);
+        if (code != 0) {
+            if (rank == 0) printFailure(code);
+            return code;
+        }
+    }
 
     if (rank == 0)
         cout << "[FreeFemCheckpoint] write: input " << globalInput

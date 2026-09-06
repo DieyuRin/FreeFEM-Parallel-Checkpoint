@@ -2,14 +2,18 @@
 # test_payload_invariance.sh -- writer np must not change the canonical payload.
 set -u
 cd "$(dirname "$0")/.." || exit 2
+FF_MPIRUN="${FF_MPIRUN:-ff-mpirun}"
+TIMEOUT="${FFCP_TEST_TIMEOUT:-120}"
+FF_RUN=(timeout "$TIMEOUT" "$FF_MPIRUN")
+
 OUT="tests/out"; mkdir -p "$OUT"
-W=(1 2 4 8 16)
+W=(1 2 3 4 8 16)
 fails=0
 
 files=()
 for w in "${W[@]}"; do
     f="$OUT/p1_w$w.ffio"
-    if ff-mpirun -np "$w" examples/p1_write.edp -out "$f" -v 0 2>/dev/null \
+    if "${FF_RUN[@]}" -np "$w" examples/p1_write.edp -out "$f" -v 0 2>/dev/null \
          | grep -q "P1 WRITE OK"; then
         files+=("$f")
     else

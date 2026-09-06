@@ -32,8 +32,8 @@ int n = ffcpWrite("neg_conflict.ffio", gid, u[]);
 
 if (mpirank == 0) {
     cout << "neg_conflict: ffcpWrite returned " << n << endl;
-    if (n < 0)
+    if (n == -17)
         cout << "NEG-CONFLICT EXPECT-FAIL OK" << endl;
     else
-        cout << "NEG-CONFLICT UNEXPECTED SUCCESS" << endl;
+        cout << "NEG-CONFLICT UNEXPECTED RETURN " << n << endl;
 }

@@ -90,7 +90,7 @@ assert(gid.n == u[].n);
 ffcpWrite("checkpoint.ffio", gid, u[]);
 ```
 
-Restart (rebuild `ThGlobal`/`n2o`/`gid` exactly as above, any MPI size):
+Restart (rebuild `ThGlobal`/`n2o`/`gid` exactly as above; writer and reader MPI sizes may differ):
 
 ```cpp
 Vh u = 0.0;
@@ -215,10 +215,11 @@ specification and compatibility policy: `docs/FILE_FORMAT.md`.
 
 - double (`real`) payloads only; `complex` not supported (save real and
   imaginary parts as two checkpoints — see `docs/RECIPES.md`)
-- restart requires the same global mesh / FE definition as the write (any np);
+- restart requires the same global mesh / FE definition as the write (writer and reader MPI sizes may differ);
   the file format does not detect a *different* mesh/FE space with a
   coincidentally compatible gid range
 - non-Lagrange FE (edge/face DOFs) and periodic conditions are not tested
+- writer coverage guarantee: complete contiguous coverage of the inferred `[0, max(gid)]` is required and interior gaps are rejected; a missing canonical suffix beyond `max(gid)` is not detectable because the plugin does not know the expected global FE-space dimension (a FreeFEM-side responsibility)
 - one checkpoint state = one file (no multi-dataset format)
 - `MPI_Alltoallv` uses `int` counts/displacements: no single exchange buffer
   may exceed `INT_MAX` entries on a rank

@@ -1,6 +1,6 @@
 // mixed_read.edp -- N-to-M restart read of a MIXED [P2,P2,P1] checkpoint.
 //
-// Reads a mixed checkpoint (written with any np) with the current np and
+// Reads a mixed checkpoint (written with N ranks) with the current M ranks and
 // checks every local DOF against the exact component functions.
 //
 // Run:  ff-mpirun -np M examples/mixed_read.edp -chk checkpoint_mixed.ffio -v 0

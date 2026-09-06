@@ -1,5 +1,7 @@
-// neg_badgid.edp -- negative test: gid[] contains an out-of-range canonical
-// id (shifted by +1).  ffcpWrite must fail collectively.
+// neg_badgid.edp -- negative test: every gid shifted by +1 removes canonical
+// gid 0 from the mapping (the writer infers Nglobal = max(gid)+1, so the
+// shift is NOT out of range -- it creates a MISSING canonical DOF 0).
+// ffcpWrite must fail collectively with kErrCanonicalization (-17).
 //
 // Run:  ff-mpirun -np 4 tests/edp/neg_badgid.edp -v 0
 
@@ -29,8 +31,8 @@ int n = ffcpWrite("neg_badgid.ffio", gid, u[]);
 
 if (mpirank == 0) {
     cout << "neg_badgid: ffcpWrite returned " << n << endl;
-    if (n < 0)
+    if (n == -17)
         cout << "NEG-BADGID EXPECT-FAIL OK" << endl;
     else
-        cout << "NEG-BADGID UNEXPECTED SUCCESS" << endl;
+        cout << "NEG-BADGID UNEXPECTED RETURN " << n << endl;
 }

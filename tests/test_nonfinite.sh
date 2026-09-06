@@ -3,15 +3,19 @@
 # (kErrNonFinite).
 set -u
 cd "$(dirname "$0")/.." || exit 2
+FF_MPIRUN="${FF_MPIRUN:-ff-mpirun}"
+TIMEOUT="${FFCP_TEST_TIMEOUT:-120}"
+FF_RUN=(timeout "$TIMEOUT" "$FF_MPIRUN")
 
-if ff-mpirun -np 4 tests/edp/neg_nan.edp -v 0 2>/dev/null \
+
+if "${FF_RUN[@]}" -np 4 tests/edp/neg_nan.edp -v 0 2>/dev/null \
      | grep -q "NEG-NAN EXPECT-FAIL OK"; then
     echo "NaN value: rejected as expected"
 else
     echo "FAIL nonfinite: NaN was accepted"; exit 1
 fi
 
-if ff-mpirun -np 4 tests/edp/neg_inf.edp -v 0 2>/dev/null \
+if "${FF_RUN[@]}" -np 4 tests/edp/neg_inf.edp -v 0 2>/dev/null \
      | grep -q "NEG-INF EXPECT-FAIL OK"; then
     echo "+Inf value: rejected as expected"
 else

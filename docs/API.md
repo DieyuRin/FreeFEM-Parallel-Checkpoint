@@ -29,7 +29,7 @@ Collectively read the canonical checkpoint `filename` and fill the *current*
 local (overlapping) vector: `values[i] = payload[gid[i]]`.
 
 - The same canonical numbering recipe must be used as at write time (same
-  global mesh / FE space definition; any MPI size).
+  global mesh / FE space definition; writer and reader MPI sizes may differ).
 - The reader validates: magic, version, scalar width, `Nglobal`, exact file
   size `64 + Nglobal * 8`, and the local gid range `[0, Nglobal)`.
 

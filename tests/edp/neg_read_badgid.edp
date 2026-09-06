@@ -32,8 +32,8 @@ int n = ffcpRead(fname, gid, u[]);
 
 if (mpirank == 0) {
     cout << "neg_read_badgid: ffcpRead returned " << n << endl;
-    if (n < 0)
+    if (n == -10)
         cout << "NEG-READ-BADGID EXPECT-FAIL OK" << endl;
     else
-        cout << "NEG-READ-BADGID UNEXPECTED SUCCESS" << endl;
+        cout << "NEG-READ-BADGID UNEXPECTED RETURN " << n << endl;
 }

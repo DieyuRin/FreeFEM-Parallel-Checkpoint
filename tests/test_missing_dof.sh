@@ -3,8 +3,12 @@
 # is not covered by any rank (here: shifting all gids by +1 drops gid 0).
 set -u
 cd "$(dirname "$0")/.." || exit 2
+FF_MPIRUN="${FF_MPIRUN:-ff-mpirun}"
+TIMEOUT="${FFCP_TEST_TIMEOUT:-120}"
+FF_RUN=(timeout "$TIMEOUT" "$FF_MPIRUN")
 
-if ff-mpirun -np 4 tests/edp/neg_badgid.edp -v 0 2>/dev/null \
+
+if "${FF_RUN[@]}" -np 4 tests/edp/neg_badgid.edp -v 0 2>/dev/null \
      | grep -q "NEG-BADGID EXPECT-FAIL OK"; then
     echo "missing canonical DOF: collective failure as expected"
 else

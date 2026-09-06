@@ -28,8 +28,8 @@ int n = ffcpWrite("neg_negativegid.ffio", gid, u[]);
 
 if (mpirank == 0) {
     cout << "neg_negativegid: ffcpWrite returned " << n << endl;
-    if (n < 0)
+    if (n == -16)
         cout << "NEG-NEGATIVEGID EXPECT-FAIL OK" << endl;
     else
-        cout << "NEG-NEGATIVEGID UNEXPECTED SUCCESS" << endl;
+        cout << "NEG-NEGATIVEGID UNEXPECTED RETURN " << n << endl;
 }

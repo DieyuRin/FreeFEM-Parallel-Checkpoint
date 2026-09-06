@@ -29,8 +29,8 @@ int n = ffcpWrite("neg_nan.ffio", gid, u[]);
 
 if (mpirank == 0) {
     cout << "neg_nan: ffcpWrite returned " << n << endl;
-    if (n < 0)
+    if (n == -19)
         cout << "NEG-NAN EXPECT-FAIL OK" << endl;
     else
-        cout << "NEG-NAN UNEXPECTED SUCCESS" << endl;
+        cout << "NEG-NAN UNEXPECTED RETURN " << n << endl;
 }

@@ -58,6 +58,8 @@ canonical DOF. Copies must be finite and agree within the relative tolerance
 Disagreement beyond the tolerance or any NaN/Inf input fails the write. The
 stored payload contains exactly one value per canonical DOF.
 
+Writer coverage guarantee: the writer requires complete contiguous coverage of the inferred canonical range `[0, max(gid)]`; interior gaps are rejected. Because `Nglobal` is inferred from the supplied gids (`max+1`), the plugin cannot detect a missing canonical suffix beyond that maximum: it does not independently know the expected global FE-space dimension, and correctness of the supplied canonical map remains a FreeFEM-side responsibility.
+
 ## Partition-independence semantics
 
 The canonical **layout** is writer-partition independent:

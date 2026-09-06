@@ -28,8 +28,8 @@ int n = ffcpWrite("neg_mismatch.ffio", gid, vals);
 
 if (mpirank == 0) {
     cout << "neg_size_mismatch: ffcpWrite returned " << n << endl;
-    if (n < 0)
+    if (n == -2)
         cout << "NEG-SIZEMISMATCH EXPECT-FAIL OK" << endl;
     else
-        cout << "NEG-SIZEMISMATCH UNEXPECTED SUCCESS" << endl;
+        cout << "NEG-SIZEMISMATCH UNEXPECTED RETURN " << n << endl;
 }
