@@ -235,26 +235,6 @@ multiple independent fields.
 V3 stabilization release, version **0.3.0**. Roadmap and coding rules:
 `docs/DEVELOPMENT.md`, `CONTRIBUTING.md`.
 
-## Citation
-
-If FreeFemCheckpoint contributes to your research, please cite it as:
-
-> DieyuRin. (2026). *FreeFemCheckpoint: Partition-independent parallel
-> checkpoint/restart plugin for FreeFEM* (Version 0.3.0).
-> https://github.com/DieyuRin/FreeFEM-Parallel-Checkpoint
-
-```bibtex
-@software{freefemcheckpoint,
-  author  = {DieyuRin},
-  title   = {{FreeFemCheckpoint}: Partition-Independent Parallel
-             Checkpoint/Restart Plugin for {FreeFEM}},
-  year    = {2026},
-  version = {0.3.0},
-  license = {LGPL-3.0-or-later},
-  url     = {https://github.com/DieyuRin/FreeFEM-Parallel-Checkpoint}
-}
-```
-
 ## License
 
 FreeFemCheckpoint is licensed under the GNU Lesser General Public License
