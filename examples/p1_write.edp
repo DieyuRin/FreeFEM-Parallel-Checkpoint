@@ -1,0 +1,39 @@
+// p1_write.edp -- canonical checkpoint write of a scalar P1 field.
+//
+// Run:  ff-mpirun -np 4 examples/p1_write.edp -v 0
+//       (optional: -out name.ffio to choose the output file)
+
+load "./FreeFemCheckpoint"
+
+macro dimension()2//
+include "macro_ddm.idp"
+
+int[int] n2o;
+macro ThN2O()n2o//
+
+mesh Th = square(32, 32, [x, y]);
+mesh ThGlobal = Th;            // keep the global mesh before DmeshCreate
+
+DmeshCreate(Th);
+
+fespace Vh(Th, P1);
+fespace VhGlobal(ThGlobal, P1);
+
+Vh u = cos(x - 0.5) * cos(y - 0.5);
+
+int[int] gid = restrict(Vh, VhGlobal, n2o);
+assert(gid.n == u[].n);
+
+string out = getARGV("-out", "checkpoint_p1.ffio");
+
+int n = ffcpWrite(out, gid, u[]);
+
+if (mpirank == 0) {
+    cout << "p1_write: stored " << n << " canonical DOFs"
+         << " (VhGlobal.ndof = " << VhGlobal.ndof << ") -> "
+         << out << endl;
+    if (n == VhGlobal.ndof)
+        cout << "P1 WRITE OK" << endl;
+    else
+        cout << "P1 WRITE FAILED" << endl;
+}

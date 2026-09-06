@@ -1,0 +1,48 @@
+// p1_read.edp -- N-to-M restart read of a scalar P1 checkpoint.
+//
+// Reads a checkpoint (written with any np) with the current np and checks
+// every local DOF against the exact function.
+//
+// Run:  ff-mpirun -np M examples/p1_read.edp -chk checkpoint_p1.ffio -v 0
+
+load "./FreeFemCheckpoint"
+
+macro dimension()2//
+include "macro_ddm.idp"
+
+string fname = getARGV("-chk", "checkpoint_p1.ffio");
+
+int[int] n2o;
+macro ThN2O()n2o//
+
+mesh Th = square(32, 32, [x, y]);
+mesh ThGlobal = Th;
+
+DmeshCreate(Th);
+
+fespace Vh(Th, P1);
+fespace VhGlobal(ThGlobal, P1);
+
+Vh u = 0.0;
+Vh uExact = cos(x - 0.5) * cos(y - 0.5);
+
+int[int] gid = restrict(Vh, VhGlobal, n2o);
+
+int n = ffcpRead(fname, gid, u[]);
+
+real locErr = 0.0;
+for (int i = 0; i < u[].n; ++i)
+    locErr = max(locErr, abs(u[][i] - uExact[][i]));
+real gerr;
+mpiAllReduce(locErr, gerr, mpiCommWorld, mpiMAX);
+
+if (mpirank == 0) {
+    cout << "p1_read: file = " << fname << "  reader np = " << mpisize
+         << "  canonical DOFs = " << n
+         << " (VhGlobal.ndof = " << VhGlobal.ndof << ")" << endl;
+    cout << "p1_read: max |u - exact| (global) = " << gerr << endl;
+    if (n == VhGlobal.ndof && gerr < 1.0e-12)
+        cout << "P1 READ TEST OK" << endl;
+    else
+        cout << "P1 READ TEST FAILED" << endl;
+}

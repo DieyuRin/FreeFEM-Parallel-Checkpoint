@@ -1,0 +1,35 @@
+// neg_negativegid.edp -- negative test: a negative gid entry.
+// ffcpWrite must fail collectively (kErrInvalidGid).
+//
+// Run:  ff-mpirun -np 4 tests/edp/neg_negativegid.edp -v 0
+
+load "./FreeFemCheckpoint"
+
+macro dimension()2//
+include "macro_ddm.idp"
+
+int[int] n2o;
+macro ThN2O()n2o//
+
+mesh Th = square(32, 32, [x, y]);
+mesh ThGlobal = Th;
+
+DmeshCreate(Th);
+
+fespace Vh(Th, P1);
+fespace VhGlobal(ThGlobal, P1);
+
+Vh u = cos(x - 0.5) * cos(y - 0.5);
+
+int[int] gid = restrict(Vh, VhGlobal, n2o);
+gid[0] = -1;
+
+int n = ffcpWrite("neg_negativegid.ffio", gid, u[]);
+
+if (mpirank == 0) {
+    cout << "neg_negativegid: ffcpWrite returned " << n << endl;
+    if (n < 0)
+        cout << "NEG-NEGATIVEGID EXPECT-FAIL OK" << endl;
+    else
+        cout << "NEG-NEGATIVEGID UNEXPECTED SUCCESS" << endl;
+}

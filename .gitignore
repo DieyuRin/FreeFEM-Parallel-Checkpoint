@@ -1,0 +1,8 @@
+*.o
+*.so
+*.ffio
+*.log
+tests/out/
+build/
+tmp/
+__pycache__/

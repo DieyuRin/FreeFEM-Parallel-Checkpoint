@@ -1,0 +1,50 @@
+// mixed_read.edp -- N-to-M restart read of a MIXED [P2,P2,P1] checkpoint.
+//
+// Reads a mixed checkpoint (written with any np) with the current np and
+// checks every local DOF against the exact component functions.
+//
+// Run:  ff-mpirun -np M examples/mixed_read.edp -chk checkpoint_mixed.ffio -v 0
+
+load "./FreeFemCheckpoint"
+
+macro dimension()2//
+include "macro_ddm.idp"
+
+string fname = getARGV("-chk", "checkpoint_mixed.ffio");
+
+int[int] n2o;
+macro ThN2O()n2o//
+
+mesh Th = square(32, 32, [x, y]);
+mesh ThGlobal = Th;
+
+DmeshCreate(Th);
+
+func Pk = [P2, P2, P1];
+fespace Wh(Th, Pk);
+fespace WhGlobal(ThGlobal, Pk);
+
+// component-list assignments only (see note in mixed_write.edp)
+Wh [u1, u2, p] = [0.0, 0.0, 0.0];
+Wh [e1, e2, pe] = [cos(x), sin(y), x + y];   // exact reference
+
+int[int] gid = restrict(Wh, WhGlobal, n2o);
+
+int n = ffcpRead(fname, gid, u1[]);
+
+real locErr = 0.0;
+for (int i = 0; i < u1[].n; ++i)
+    locErr = max(locErr, abs(u1[][i] - e1[][i]));
+real gerr;
+mpiAllReduce(locErr, gerr, mpiCommWorld, mpiMAX);
+
+if (mpirank == 0) {
+    cout << "mixed_read: file = " << fname << "  reader np = " << mpisize
+         << "  canonical DOFs = " << n
+         << " (WhGlobal.ndof = " << WhGlobal.ndof << ")" << endl;
+    cout << "mixed_read: max |u[] - exact| (global) = " << gerr << endl;
+    if (n == WhGlobal.ndof && gerr < 1.0e-12)
+        cout << "MIXED READ TEST OK" << endl;
+    else
+        cout << "MIXED READ TEST FAILED" << endl;
+}

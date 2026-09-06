@@ -1,0 +1,47 @@
+// mixed_write.edp -- canonical checkpoint write of a MIXED FE field
+// [P2,P2,P1] (e.g. Stokes u,v,p) in a single call.
+//
+// The coefficient vector u1[] of the first component is the whole mixed FE
+// coefficient vector (u1[].n == Wh.ndof); restrict() returns one canonical id
+// per local DOF across all components, so one ffcpWrite call stores the full
+// mixed field.
+//
+// Run:  ff-mpirun -np 4 examples/mixed_write.edp -v 0
+//       (optional: -out name.ffio)
+
+load "./FreeFemCheckpoint"
+
+macro dimension()2//
+include "macro_ddm.idp"
+
+int[int] n2o;
+macro ThN2O()n2o//
+
+mesh Th = square(32, 32, [x, y]);
+mesh ThGlobal = Th;
+
+DmeshCreate(Th);
+
+func Pk = [P2, P2, P1];
+fespace Wh(Th, Pk);
+fespace WhGlobal(ThGlobal, Pk);
+
+// Multi-component FE assignment uses a component list (a scalar broadcast is
+// not valid syntax for mixed spaces).
+Wh [u1, u2, p] = [cos(x), sin(y), x + y];
+
+int[int] gid = restrict(Wh, WhGlobal, n2o);
+assert(gid.n == u1[].n);          // u1[] is the whole mixed coefficient vector
+
+string out = getARGV("-out", "checkpoint_mixed.ffio");
+
+int n = ffcpWrite(out, gid, u1[]);
+
+if (mpirank == 0) {
+    cout << "mixed_write: stored " << n << " canonical DOFs"
+         << " (WhGlobal.ndof = " << WhGlobal.ndof << ") -> " << out << endl;
+    if (n == WhGlobal.ndof)
+        cout << "MIXED WRITE OK" << endl;
+    else
+        cout << "MIXED WRITE FAILED" << endl;
+}

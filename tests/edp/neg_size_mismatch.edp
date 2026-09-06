@@ -1,0 +1,35 @@
+// neg_size_mismatch.edp -- negative test: gid[].n != values[].n.
+// ffcpWrite must fail collectively (kErrSizeMismatch).
+//
+// Run:  ff-mpirun -np 4 tests/edp/neg_size_mismatch.edp -v 0
+
+load "./FreeFemCheckpoint"
+
+macro dimension()2//
+include "macro_ddm.idp"
+
+int[int] n2o;
+macro ThN2O()n2o//
+
+mesh Th = square(32, 32, [x, y]);
+mesh ThGlobal = Th;
+
+DmeshCreate(Th);
+
+fespace Vh(Th, P1);
+fespace VhGlobal(ThGlobal, P1);
+
+Vh u = cos(x - 0.5) * cos(y - 0.5);
+
+int[int] gid = restrict(Vh, VhGlobal, n2o);
+real[int] vals = u[](0:u[].n - 2);   // one entry shorter than gid[]
+
+int n = ffcpWrite("neg_mismatch.ffio", gid, vals);
+
+if (mpirank == 0) {
+    cout << "neg_size_mismatch: ffcpWrite returned " << n << endl;
+    if (n < 0)
+        cout << "NEG-SIZEMISMATCH EXPECT-FAIL OK" << endl;
+    else
+        cout << "NEG-SIZEMISMATCH UNEXPECTED SUCCESS" << endl;
+}
